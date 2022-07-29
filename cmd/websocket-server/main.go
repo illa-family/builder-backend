@@ -25,6 +25,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/illa-family/builder-backend/internal/repository"
 	"github.com/illa-family/builder-backend/internal/util"
+	"github.com/illa-family/builder-backend/pkg/action"
 	"github.com/illa-family/builder-backend/pkg/app"
 	"github.com/illa-family/builder-backend/pkg/db"
 	"github.com/illa-family/builder-backend/pkg/resource"
@@ -42,6 +43,7 @@ var kvssi *state.KVStateServiceImpl
 var sssi *state.SetStateServiceImpl
 var asi *app.AppServiceImpl
 var rsi *resource.ResourceServiceImpl
+var acsi *action.ActionServiceImpl
 
 func initEnv() error {
 	sugaredLogger := util.NewSugardLogger()
@@ -65,6 +67,7 @@ func initEnv() error {
 	tssi = state.NewTreeStateServiceImpl(sugaredLogger, treestateRepositoryImpl)
 	kvssi = state.NewKVStateServiceImpl(sugaredLogger, kvstateRepositoryImpl)
 	sssi = state.NewSetStateServiceImpl(sugaredLogger, setstateRepositoryImpl)
+	acsi = action.NewActionServiceImpl(sugaredLogger, actionRepositoryImpl)
 	asi = app.NewAppServiceImpl(sugaredLogger, appRepositoryImpl, userRepositoryImpl, kvstateRepositoryImpl, treestateRepositoryImpl, setstateRepositoryImpl, actionRepositoryImpl)
 	rsi = resource.NewResourceServiceImpl(sugaredLogger, resourceRepositoryImpl)
 	return nil
@@ -84,6 +87,7 @@ func InitHub(asi *app.AppServiceImpl, rsi *resource.ResourceServiceImpl, tssi *s
 	appHub.SetTreeStateServiceImpl(tssi)
 	appHub.SetKVStateServiceImpl(kvssi)
 	appHub.SetSetStateServiceImpl(sssi)
+	appHub.SetActionServiceImpl(acsi)
 	go filter.Run(appHub)
 }
 

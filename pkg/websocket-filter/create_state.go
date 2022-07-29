@@ -118,6 +118,20 @@ func SignalCreateState(hub *ws.Hub, message *ws.Message) error {
 		// serve on HTTP API, this signal only for broadcast
 	case ws.TARGET_RESOURCE:
 		// serve on HTTP API, this signal only for broadcast
+	case ws.TARGET_ACTION:
+		// create action state
+		for _, v := range message.Payload {
+			// fill KVStateDto
+			ActionDto := state.NewActionDto()
+			ActionDto.ConstructByMap(v)
+			ActionDto.ConstructByApp(appDto) // set AppRefID
+
+			if _, err := hub.ActionServiceImpl.CreateAction(ActionDto); err != nil {
+				currentClient.Feedback(message, ws.ERROR_CREATE_STATE_FAILED, err)
+				return err
+			}
+		}
+
 	}
 
 	// the currentClient does not need feedback when operation success

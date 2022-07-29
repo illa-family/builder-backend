@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/illa-family/builder-backend/internal/repository"
+	"github.com/illa-family/builder-backend/pkg/app"
 	"go.uber.org/zap"
 )
 
@@ -64,6 +65,65 @@ type ActionServiceImpl struct {
 	logger             *zap.SugaredLogger
 	actionRepository   repository.ActionRepository
 	resourceRepository repository.ResourceRepository
+}
+
+func NewActionDto() *ActionDto {
+	return &ActionDto{}
+}
+
+func (ad *ActionDto) ConstructByMap(data interface{}) error {
+	udata, ok := data.(map[string]interface{})
+	if !ok {
+		err := errors.New("ActionDto construct by map failed, please check your input payload syntax.")
+		return err
+	}
+	for k, v := range udata {
+		switch k {
+		case "displayName":
+			ad.DisplayName, _ = v.(string)
+		case "actionType":
+			ad.Type, _ = v.(string)
+		case "transformer":
+			ad.Transformer, _ = v.(map[string]interface{})
+		case "triggerMode":
+			ad.TriggerMode, _ = v.(string)
+		case "resourceId":
+			appf, _ := v.(float64)
+			ad.Resource = int(appf)
+		case "content":
+			ad.Template, _ = v.(map[string]interface{})
+		}
+	}
+	return nil
+}
+
+func (ad *ActionDto) ConstructIDByMap(data interface{}) error {
+	udata, ok := data.(map[string]interface{})
+	if !ok {
+		err := errors.New("ActionDto construct by map failed, please check your input payload syntax.")
+		return err
+	}
+	for k, v := range udata {
+		switch k {
+		case "actionId":
+			ad.ID, _ = v.(int)
+		}
+	}
+	return nil
+}
+
+func (ad *ActionDto) ConstructWithDisplayNameForDelete(displayNameInterface interface{}) error {
+	dnis, ok := displayNameInterface.(string)
+	if !ok {
+		err := errors.New("ConstructWithDisplayNameForDelete() can not resolve displayName.")
+		return err
+	}
+	ad.DisplayName = dnis
+	return nil
+}
+
+func (ad *ActionDto) ConstructByApp(app *app.AppDto) {
+	ad.App = app.ID
 }
 
 func NewActionServiceImpl(logger *zap.SugaredLogger, actionRepository repository.ActionRepository,

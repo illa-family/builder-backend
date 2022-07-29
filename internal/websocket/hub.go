@@ -15,6 +15,7 @@
 package ws
 
 import (
+	"github.com/illa-family/builder-backend/pkg/action"
 	"github.com/illa-family/builder-backend/pkg/app"
 	"github.com/illa-family/builder-backend/pkg/resource"
 	"github.com/illa-family/builder-backend/pkg/state"
@@ -45,6 +46,7 @@ type Hub struct {
 	SetStateServiceImpl  *state.SetStateServiceImpl
 	AppServiceImpl       *app.AppServiceImpl
 	ResourceServiceImpl  *resource.ResourceServiceImpl
+	ActionServiceImpl    *action.ActionServiceImpl
 }
 
 func NewHub() *Hub {
@@ -75,6 +77,10 @@ func (hub *Hub) SetAppServiceImpl(asi *app.AppServiceImpl) {
 
 func (hub *Hub) SetResourceServiceImpl(rsi *resource.ResourceServiceImpl) {
 	hub.ResourceServiceImpl = rsi
+}
+
+func (hub *Hub) SetActionServiceImpl(acsi *action.ActionServiceImpl) {
+	hub.ActionServiceImpl = acsi
 }
 
 func (hub *Hub) BroadcastToOtherClients(message *Message, currentClient *Client) {
